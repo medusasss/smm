@@ -34,7 +34,7 @@
 }
 
  * {
-            margin: 0;
+            margin: 1px;
             padding: 0;
             box-sizing: border-box;
         }
@@ -79,11 +79,9 @@
             top: 0;
             z-index: 50;
             background: var(--bg);
-            padding: 1rem 0;
+            padding: 0.5rem 0;
             margin-bottom: 2rem;
             text-align: center;
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
         }
 
         .nav-label {
@@ -112,10 +110,10 @@
             border: 1.4px solid var(--border);
             background: var(--surface);
             color: rgba(27,27,27,.92);
-            border-radius: 50%;
+            border-radius: 20%;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: 400;
+            font-size: 0.8rem;
             transition: all 0.25s ease;
             display: flex;
             align-items: center;
@@ -172,20 +170,20 @@
         }
 
         .day-number {
-            font-size: 2.7rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--brand-dark);
-            line-height: 0.5;
+            line-height: 0.9;
             margin-bottom: 0.2rem;
         }
 
         .day-number span {
-            font-size: 0.5em;
+            font-size: 1rem;
             text-transform: uppercase;
             color: rgb(51, 57, 203);
             font-weight: 400;
             display: inline;
-            margin-left: 0.5rem;
+            margin-left: 0.4rem;
         }
 
         /* PARTE 1 - DEFAULT VIEW */
@@ -441,7 +439,7 @@
             }
 
             .day-number {
-                font-size: 2.5rem;
+                font-size: 1.5rem;
             }
 
             .parte-uno-grid {
@@ -523,6 +521,10 @@
    - Makes section icons and chevron use the brand color
    - Uses currentColor so you can theme via --brand / --brand-dark
    ========================================= */
+.nav-container {
+  backdrop-filter: blur(10px);
+  background: rgba(245, 245, 245, 0.6);
+}
 
 /* Remove emoji styling if still present */
 .dropdown-emoji { display: none !important; }
@@ -596,7 +598,7 @@ html, body{
 .dropdown-title,
 .table-title{
   font-family: var(--font-title);
-  letter-spacing: 0.2px; /* leggero, per leggibilità monospace */
+  letter-spacing: -0.4px; /* leggero, per leggibilità monospace */
 }
 
 /* (opzionale) rendi i titoli un po’ più “tech” senza urlare */
@@ -614,5 +616,3 @@ header p,
 th, td{
   font-family: var(--font-body);
 }
-
-
