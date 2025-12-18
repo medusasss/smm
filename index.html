@@ -444,12 +444,17 @@
         // 4) INTERACTIONS
         // =========================
         function showDay(dayKey, btn) {
-            const selectedCard = document.getElementById(`day-${dayKey}`);
-            if (selectedCard) selectedCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    const selectedCard = document.getElementById(`day-${dayKey}`);
+    if (selectedCard) {
+        const offset = 80;
+        const y = selectedCard.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+    }
 
-            document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
-            if (btn) btn.classList.add("active");
-        }
+    document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+}
+
 
         function toggleDropdown(button) {
             button.classList.toggle("open");
