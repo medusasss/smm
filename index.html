@@ -446,7 +446,7 @@
         function showDay(dayKey, btn) {
     const selectedCard = document.getElementById(`day-${dayKey}`);
     if (selectedCard) {
-        const offset = 80;
+        const offset = 100;
         const y = selectedCard.getBoundingClientRect().top + window.pageYOffset - offset;
         window.scrollTo({ top: y, behavior: 'smooth' });
     }
