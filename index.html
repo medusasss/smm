@@ -264,23 +264,58 @@
             return "";
         }
 
+
+        function parseGiornoLabel(raw, idx) {
+            const s = String(raw ?? "").trim();
+
+            // Estrae dd/mm da stringhe tipo "mer 07/12" o "mer 7/12"
+            const m = s.match(/(\d{1,2})\s*\/\s*(\d{1,2})/);
+            if (m) {
+                const dd = m[1].padStart(2, "0");
+                const mm = m[2].padStart(2, "0");
+                return {
+                    fullLabel: s.replace(/\s+/g, " "),
+                    buttonLabel: `${dd}/${mm}`,
+                    // ordinamento per mese+giorno (mmdd)
+                    sortValue: (Number(mm) * 100) + Number(dd),
+                    key: `${dd}-${mm}`
+                };
+            }
+
+            // Fallback numerico (compatibilità con lo schema precedente)
+            const n = Number(s);
+            if (Number.isFinite(n) && n > 0) {
+                const padded = String(Math.trunc(n)).padStart(2, "0");
+                return { fullLabel: padded, buttonLabel: padded, sortValue: n, key: padded };
+            }
+
+            // Ultimo fallback: usa l'indice come chiave stabile
+            return {
+                fullLabel: s || `Giorno ${idx + 1}`,
+                buttonLabel: s || String(idx + 1),
+                sortValue: idx + 1,
+                key: `row-${idx + 1}`
+            };
+        }
+
         // =========================
         // 3) RENDERING
         // =========================
-        function renderNavButtons(days) {
+        function renderNavButtons(daysMeta) {
             const nav = document.getElementById("nav-days");
             nav.innerHTML = "";
-            days.forEach((d, idx) => {
+            daysMeta.forEach((meta, idx) => {
                 const btn = document.createElement("button");
                 btn.className = "day-btn" + (idx === 0 ? " active" : "");
-                btn.textContent = String(d);
-                btn.addEventListener("click", () => showDay(d, btn));
+                btn.textContent = meta.buttonLabel;
+                btn.addEventListener("click", () => showDay(meta.key, btn));
                 nav.appendChild(btn);
             });
         }
 
-        function renderDayCard(row) {
-            const day = Number(getCol(row, ["Giorno", "Day", "giorno"]));
+        function renderDayCard(row, meta) {
+            const rawDay = getCol(row, ["Giorno", "Day", "giorno"]);
+            const dayMeta = meta || parseGiornoLabel(rawDay, 0);
             const subtitle = getCol(row, ["Sottotitolo", "Subtitle", "Titolo", "Header"]);
 
             // Summary fields (formerly "Parte 1", but we do NOT show that label)
@@ -300,11 +335,11 @@
 
             const card = document.createElement("div");
             card.className = "day-card";
-            card.id = `day-${day}`;
+            card.id = `day-${dayMeta.key}`;
 
             card.innerHTML = `
                 <div class="day-header">
-                    <div class="day-number">${String(day).padStart(2, "0")} <span>${escapeHtml(subtitle)}</span></div>
+                    <div class="day-number">${escapeHtml(dayMeta.fullLabel)} <span>${escapeHtml(subtitle)}</span></div>
                 </div>
 
                 <!-- SUMMARY GRID (no "PARTE 1" label) -->
@@ -365,27 +400,30 @@
         }
 
         function renderDays(rows) {
-            // Keep only rows with a valid day number
             const cleaned = rows
-                .map(r => ({ r, d: Number(getCol(r, ["Giorno", "Day", "giorno"])) }))
-                .filter(x => Number.isFinite(x.d) && x.d > 0)
-                .sort((a, b) => a.d - b.d);
+                .map((r, idx) => {
+                    const raw = getCol(r, ["Giorno", "Day", "giorno"]);
+                    const meta = parseGiornoLabel(raw, idx);
+                    return { r, meta };
+                })
+                .filter(x => x.meta && x.meta.key)
+                .sort((a, b) => a.meta.sortValue - b.meta.sortValue);
 
-            const uniqueDays = [];
-            const byDay = new Map();
+            const uniqueKeys = [];
+            const byKey = new Map();
 
             cleaned.forEach(x => {
-                if (!byDay.has(x.d)) {
-                    byDay.set(x.d, x.r);
-                    uniqueDays.push(x.d);
+                if (!byKey.has(x.meta.key)) {
+                    byKey.set(x.meta.key, x);
+                    uniqueKeys.push(x.meta.key);
                 }
             });
 
-            renderNavButtons(uniqueDays);
+            renderNavButtons(uniqueKeys.map(k => byKey.get(k).meta));
 
             const container = document.getElementById("days-container");
             container.innerHTML = "";
-            uniqueDays.forEach(d => container.appendChild(renderDayCard(byDay.get(d))));
+            uniqueKeys.forEach(k => { const obj = byKey.get(k); container.appendChild(renderDayCard(obj.r, obj.meta)); });
         }
 
         function renderRiepilogo(rows) {
@@ -407,15 +445,7 @@
         // =========================
         function showDay(dayKey, btn) {
             const selectedCard = document.getElementById(`day-${dayKey}`);
-            const nav = document.querySelector(".nav-container");
-
-            if (selectedCard) {
-                const navH = nav ? nav.getBoundingClientRect().height : 0;
-                const rect = selectedCard.getBoundingClientRect();
-                const targetY = window.scrollY + rect.top - navH - 12; // 12px di respiro sotto la navbar
-
-                window.scrollTo({ top: targetY, behavior: "smooth" });
-            }
+            if (selectedCard) selectedCard.scrollIntoView({ behavior: "smooth", block: "start" });
 
             document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
             if (btn) btn.classList.add("active");
@@ -458,3 +488,4 @@
     </script>
 </body>
 </html>
+
