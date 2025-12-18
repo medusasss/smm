@@ -1,0 +1,618 @@
+/* =========================
+   Minimal theme tokens (Awalyt)
+   Brand:
+   - Primary: #7d53ff
+   - Primary dark: #3339cb
+   - Accent (use sparingly): #b9ff40
+   Neutrals:
+   - Text: #1b1b1b
+   - BG:   #f5f5f5
+========================= */
+
+:root{
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-2: #fbfbfd;
+
+  --text: #1b1b1b;
+  --muted: rgba(27,27,27,.62);
+
+  --brand: #7d53ff;
+  --brand-dark: #3339cb;
+  --accent: #b9ff40; /* only on dark surfaces for accessibility */
+
+  --border: rgba(27,27,27,.12);
+  --border-strong: rgba(27,27,27,.18);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
+
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --ring: 0 0 0 3px rgba(125,83,255,.22);
+}
+
+ * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            border-bottom: 2px solid var(--brand-dark);
+            padding-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            color: var(--brand);
+            margin-bottom: 0.5rem;
+            letter-spacing: -1.5px;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        /* NAVIGATION DAYS */
+        .nav-container {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--bg);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0px;
+            color: var(--muted);
+            margin-bottom: 1rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        .nav-days {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .day-btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: 1.4px solid var(--border);
+            background: var(--surface);
+            color: rgba(27,27,27,.92);
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-btn:hover {
+            border-color: var(--brand);
+            color: var(--brand);
+            background: rgba(125,83,255,.06);
+        }
+
+        .day-btn.active {
+            background: var(--brand);
+            color: var(--surface);
+            border-color: rgba(125,83,255,.35);
+        }
+
+        .day-btn:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        /* DAY CARD STRUCTURE */
+        .days-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .day-card {
+            display: block;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .day-card.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* DAY HEADER */
+        .day-header {
+            background: linear-gradient(135deg, rgba(125,83,255,.06) 0%, rgba(51,57,203,.03) 100%);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .day-number {
+            font-size: 2.7rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+            line-height: 0.5;
+            margin-bottom: 0.2rem;
+        }
+
+        .day-number span {
+            font-size: 0.5em;
+            text-transform: uppercase;
+            color: rgb(51, 57, 203);
+            font-weight: 400;
+            display: inline;
+            margin-left: 0.5rem;
+        }
+
+        /* PARTE 1 - DEFAULT VIEW */
+        .parte-uno {
+            padding: 2rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .parte-uno h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--brand);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .parte-uno-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .parte-uno-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .parte-uno-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(27,27,27,.45);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .parte-uno-value {
+            font-size: 1rem;
+            color: var(--text);
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .parte-uno-value strong {
+            color: var(--brand);
+            font-weight: 700;
+        }
+
+        .visual-type {
+            display: inline-block;
+            background: var(--bg);
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 1rem;
+            border-left: 3px solid var(--brand);
+        }
+
+        /* DROPDOWN MENU */
+        .dropdowns-container {
+            padding: 0;
+        }
+
+        .dropdown-section {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dropdown-section:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            background: var(--surface);
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.25s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .dropdown-toggle:hover {
+            background: rgba(125,83,255,.06);
+            border-left-color: var(--brand);
+        }
+
+        .dropdown-toggle.open {
+            background: rgba(51,57,203,.03);
+            border-left-color: var(--brand);
+        }
+
+        .dropdown-toggle:focus-visible {
+            outline: none;
+            box-shadow: var(--ring);
+        }
+
+        .dropdown-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dropdown-toggle.open .dropdown-title {
+            color: var(--brand);
+        }
+
+        .dropdown-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand);
+            font-size: 1.2rem;
+            transition: transform 0.25s ease;
+        }
+
+        .dropdown-emoji {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.3rem;
+            color: var(--brand);
+        }
+
+        .dropdown-toggle.open .dropdown-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown: animazione fluida senza max-height finto */
+.dropdown-content{
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  padding: 0 2rem;
+  transition: grid-template-rows 160ms ease, padding 160ms ease;
+  will-change: grid-template-rows, padding;
+}
+
+/* Il wrapper interno già esiste nel tuo HTML: .dropdown-body */
+.dropdown-body{
+  overflow: hidden;
+}
+
+.dropdown-content.open{
+  grid-template-rows: 1fr;
+  padding: 1.2rem 2rem 1.6rem;
+  transition-duration: 220ms; /* apertura leggermente più lenta, chiusura più rapida */
+}
+
+
+        .dropdown-body p {
+            margin-bottom: 1rem;
+        }
+
+        .dropdown-body ul, .dropdown-body ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        .dropdown-body li {
+            margin: 0.7rem 0;
+            line-height: 1.6;
+        }
+
+        .text-highlight {
+            color: var(--brand-dark);
+            font-weight: 800;
+        }
+
+        .slide-item {
+            background: rgba(125,83,255,.06);
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-radius: 4px;
+            border-left: 3px solid var(--brand);
+            font-size: 0.9rem;
+        }
+
+        .slide-item strong {
+            color: var(--brand);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .slide-item em {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .frame-box {
+            background: rgba(125,83,255,.06);
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border-left: 3px solid var(--brand);
+        }
+
+        .frame-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--brand);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .frame-content {
+            color: rgba(27,27,27,.92);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .frame-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        .frame-content p strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* FOOTER */
+        .footer-note {
+            color: rgba(27,27,27,.45);
+            font-size: 0.85rem;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-note p {
+            margin: 0.5rem 0;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .day-number {
+                font-size: 2.5rem;
+            }
+
+            .parte-uno-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .dropdown-toggle,
+            .dropdown-content.open {
+                padding: 1.2rem 1.5rem;
+            }
+
+            .nav-days {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+                gap: 0.4rem;
+            }
+
+            .day-btn {
+                font-size: 0.75rem;
+                padding: 0.6rem 0.3rem;
+            }
+        }
+
+        /* CHECKLIST STYLING */
+        .checklist-box {
+            background: rgba(125,83,255,.06);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border-left: 3px solid var(--brand);
+        }
+
+        .checklist-box li {
+            margin: 0.8rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* TABLE STYLING */
+        .table-box {
+            background: rgba(125,83,255,.06);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border-left: 3px solid var(--brand);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--surface);
+            color: var(--brand-dark);
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 2px solid var(--brand-dark);
+            font-weight: 700;
+        }
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+    
+        /* FORCE HIDE "Parte 1" LABEL (mantieni i contenuti, ma non mostrare la scritta) */
+.parte-uno h3 { display: none; }
+
+/* =========================================
+   Flat SVG icons (filled brand color)
+   - Makes section icons and chevron use the brand color
+   - Uses currentColor so you can theme via --brand / --brand-dark
+   ========================================= */
+
+/* Remove emoji styling if still present */
+.dropdown-emoji { display: none !important; }
+
+/* Ensure title layout is icon + text (flat) */
+.dropdown-title{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Flat filled icons: color drives fill (and stroke as fallback) */
+.dropdown-title svg,
+.dropdown-icon svg{
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--brand);
+  fill: currentColor;
+}
+
+/* Fallback: if SVG paths are stroke-based, keep them visible and brand-colored */
+.dropdown-title svg *[stroke],
+.dropdown-icon svg *[stroke]{
+  stroke: currentColor;
+}
+.dropdown-title svg *[fill],
+.dropdown-icon svg *[fill]{
+  fill: currentColor;
+}
+
+/* Chevron container */
+.dropdown-icon{
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand);
+  transition: transform 0.25s ease;
+}
+
+/* Rotate chevron when open */
+.dropdown-toggle.open .dropdown-icon{
+  transform: rotate(180deg);
+}
+
+/* Optional: slightly softer icon on hover for a flat UI feel */
+.dropdown-toggle:hover .dropdown-title svg{
+  color: var(--brand-dark);
+}
+/* ============================
+   Typography
+   - Titles: monospace
+   - Body: Helvetica / system sans
+   ============================ */
+
+:root{
+  --font-body: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-title: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* default */
+html, body{
+  font-family: var(--font-body);
+}
+
+/* TITOLI (monospace) */
+.day-number,
+.day-title,
+.dropdown-title,
+.table-title{
+  font-family: var(--font-title);
+  letter-spacing: 0.2px; /* leggero, per leggibilità monospace */
+}
+
+/* (opzionale) rendi i titoli un po’ più “tech” senza urlare */
+header h1,
+.day-title{
+  letter-spacing: 0.4px;
+}
+
+/* Il resto resta body */
+header p,
+.paragraph,
+.dropdown-body,
+.parte-uno-grid,
+.chips,
+th, td{
+  font-family: var(--font-body);
+}
+
+

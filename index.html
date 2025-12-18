@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Editoriale</title>
+    <link rel="stylesheet" href="styles.css">
+    </head>
+
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1 id="page-title">Piano Editoriale Awalyt</h1>
+            <p id="page-subtitle">Piano Editoriale • Lettura cliente</p>
+        </header>
+
+        <!-- NAVIGATION -->
+        <div class="nav-container">
+            <span class="nav-label">Seleziona un giorno</span>
+            <div class="nav-days" id="nav-days"></div>
+        </div>
+
+        <!-- STATUS -->
+        <div id="status" style="text-align:center; color:#666; margin-bottom:2rem;"></div>
+
+        <!-- DAYS CONTAINER -->
+        <div class="days-container" id="days-container"></div>
+
+        <!-- FOOTER -->
+        <div class="footer-note">
+            <p><strong id="footer-line1">Piano Editoriale</strong></p>
+            <p id="footer-line2">Aggiorna Google Sheet per modificare i contenuti</p>
+        </div>
+    </div>
+
+    <!-- CSV parser (no build step) -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+    <script>
+        // =========================
+        // 1) CONFIG (YOU EDIT THIS)
+        // =========================
+        const CONFIG = {
+            sheetId: "17T61M6OTVr_OMHriEiNC2mkzZGcHkuDr",
+            giorniSheetName: "Giorni",
+            riepilogoSheetName: "Riepilogo",
+        };
+
+        
+        // =========================
+        // 1b) ICONS (flat, filled SVG)
+        // =========================
+        const ICONS = {
+            pen: `
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M3 17.25V21h3.75L18.81 8.94a1.5 1.5 0 0 0 0-2.12l-1.63-1.63a1.5 1.5 0 0 0-2.12 0L3 17.25zm2.92 2.33H5v-.92l9.8-9.8.92.92-9.8 9.8z"/>
+                <path fill="currentColor" d="M19.5 20.5H12a1 1 0 1 1 0-2h7.5a1 1 0 1 1 0 2z"/>
+              </svg>`,
+            palette: `
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 2a10 10 0 0 0 0 20c1.93 0 3-1.2 3-2.67 0-1.18-.63-2.33-2.33-2.33H11a3 3 0 0 1 0-6h6.2A2.8 2.8 0 0 0 20 8.2 10 10 0 0 0 12 2zm-3.5 9a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm3-3a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm4 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm3 3a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+              </svg>`,
+            ruler: `
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M20.7 7.3a1 1 0 0 0-1.4-1.4l-1.2 1.2-1.4-1.4-1.4 1.4 1.4 1.4-1.4 1.4-1.4-1.4-1.4 1.4 1.4 1.4-1.4 1.4-1.4-1.4-1.4 1.4 1.4 1.4-1.4 1.4-1.4-1.4-1.2 1.2a1 1 0 0 0 0 1.4l2.8 2.8a1 1 0 0 0 1.4 0L20.7 7.3z"/>
+              </svg>`,
+            note: `
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h4.5L14 3.5zM8 12a1 1 0 0 1 1-1h8a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h8a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1zm0-8a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1z"/>
+              </svg>`,
+            info: `
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 5a1.25 1.25 0 1 1 0 2.5A1.25 1.25 0 0 1 12 7zm1.25 12h-2.5a1 1 0 1 1 0-2h.5v-5h-.5a1 1 0 1 1 0-2h1.5a1 1 0 0 1 1 1v6h.5a1 1 0 1 1 0 2z"/>
+              </svg>`,
+            chevron: `
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 16a1 1 0 0 1-.7-.3l-6-6a1 1 0 1 1 1.4-1.4l5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4l-6 6A1 1 0 0 1 12 16z"/>
+              </svg>`
+        };
+
+        function stripLeadingEmoji(s) {
+            // removes leading emoji/pictographic + spaces (works in modern browsers)
+            return String(s ?? "").replace(/^[\p{Extended_Pictographic}\uFE0F\u200D]+\s*/u, "");
+        }
+
+// =========================
+        // 2) HELPERS
+        // =========================
+        function setStatus(msg) {
+            const el = document.getElementById("status");
+            el.textContent = msg || "";
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        // If the cell already contains HTML tags, we trust it (because you control the Sheet).
+        // Otherwise we show it as text, preserving newlines.
+        
+        // Inline formatting:
+        // - **bold** -> <strong>
+        // - "quoted text" -> <span class="text-highlight">"quoted text"</span>
+        function parseInline(raw) {
+            const s0 = String(raw ?? "");
+            let s = escapeHtml(s0);
+
+            // Bold via **text**
+            s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+            // Highlight quoted strings
+            s = s.replace(/"([^"]+)"/g, '<span class="text-highlight">"$1"</span>');
+
+            // Auto-bold common prefixes imported as plain text
+            s = s.replace(/^(Slide[^:\n]*:)/i, "<strong>$1</strong>");
+            s = s.replace(/^(Reason\s*#\d+[^:\n]*:)/i, "<strong>$1</strong>");
+
+            return s;
+        }
+
+        function cleanLines(text) {
+            return String(text ?? "")
+                .replaceAll("\r\n", "\n")
+                .replaceAll("\r", "\n")
+                .split("\n")
+                .map(x => String(x).trim())
+                .filter(x => x && x !== "," && x !== "•" && x !== "·");
+        }
+
+        // Heuristic merge for list items when content was copied with hard wraps
+        function mergeListLines(lines) {
+            const hasExplicitBullets = lines.some(l => /^[-*•]\s+/.test(l));
+            if (hasExplicitBullets) {
+                return lines
+                    .filter(l => /^[-*•]\s+/.test(l))
+                    .map(l => l.replace(/^[-*•]\s+/, "").trim())
+                    .filter(Boolean);
+            }
+
+            const items = [];
+            let buf = "";
+            for (const line of lines) {
+                const isQuotedOnly = /^"[^"]+"$/.test(line);
+                const isVeryShort = line.length <= 4;
+                const startsLower = /^[a-zà-ÿ]/.test(line);
+                const isContinuationCue = isQuotedOnly || isVeryShort || startsLower;
+
+                if (!buf) {
+                    buf = line;
+                } else if (isContinuationCue) {
+                    buf = (buf + " " + line).replace(/\s+,/g, ",");
+                } else {
+                    items.push(buf);
+                    buf = line;
+                }
+            }
+            if (buf) items.push(buf);
+            return items;
+        }
+
+        function listToHtml(value) {
+            const lines = mergeListLines(cleanLines(value));
+            if (!lines.length) return "<p>(vuoto)</p>";
+            return "<ul>" + lines.map(l => `<li>${parseInline(l)}</li>`).join("") + "</ul>";
+        }
+
+        function paragraphsToHtml(value) {
+            const s = String(value ?? "").trim();
+            if (!s) return "<p>(vuoto)</p>";
+
+            const blocks = s
+                .replaceAll("\r\n", "\n")
+                .replaceAll("\r", "\n")
+                .split(/\n\s*\n/g)
+                .map(b => b.trim())
+                .filter(Boolean);
+
+            return blocks.map(b => "<p>" + parseInline(b).replaceAll("\n", "<br>") + "</p>").join("");
+        }
+
+        function slidesToHtml(value) {
+            const lines0 = cleanLines(value);
+            if (!lines0.length) return "<p>(vuoto)</p>";
+
+            const merged = [];
+            for (let i = 0; i < lines0.length; i++) {
+                const l = lines0[i];
+                const isSlideHeaderOnly = /^Slide\b/i.test(l) && l.trim().endsWith(":");
+                const next = lines0[i + 1];
+
+                if (isSlideHeaderOnly && next && !/^Slide\b/i.test(next)) {
+                    merged.push(l + " " + next);
+                    i++;
+                } else {
+                    merged.push(l);
+                }
+            }
+
+            return merged.map(line => {
+                const idx = line.indexOf(":");
+                if (idx > 0 && /^Slide\b/i.test(line)) {
+                    const prefix = line.slice(0, idx + 1);
+                    const rest = line.slice(idx + 1).trim();
+                    const restHtml = rest ? " " + parseInline(rest) : "";
+                    return `<div class="slide-item"><strong>${escapeHtml(prefix)}</strong>${restHtml}</div>`;
+                }
+                return `<div class="slide-item">${parseInline(line)}</div>`;
+            }).join("");
+        }
+
+        // Convert a cell to HTML according to a mode.
+        // If the cell already contains HTML tags, we keep it (because you control the Sheet).
+        function cellToHtml(value, mode) {
+            const s = String(value ?? "").trim();
+            if (!s) return "<p>(vuoto)</p>";
+            if (s.includes("<") && s.includes(">")) return s;
+
+            if (mode === "slides") return slidesToHtml(s);
+            if (mode === "list") return listToHtml(s);
+            return paragraphsToHtml(s);
+        }
+
+
+        function csvUrlForSheet(sheetName) {
+            if (!CONFIG.sheetId || CONFIG.sheetId.includes("INCOLLA_QUI")) return null;
+            const bust = Date.now();
+            return `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&cachebust=${bust}`;
+        }
+
+        async function fetchCsv(sheetName) {
+            const url = csvUrlForSheet(sheetName);
+            if (!url) throw new Error("Manca CONFIG.sheetId (ID del Google Sheet).");
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Errore fetch (${res.status}) su "${sheetName}".`);
+            return await res.text();
+        }
+
+        function parseCsv(csvText) {
+            const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+            if (parsed.errors && parsed.errors.length) {
+                console.warn(parsed.errors);
+            }
+            return parsed.data || [];
+        }
+
+        function normalizeKey(k) {
+            return String(k || "").trim().toLowerCase();
+        }
+
+        // Find a column regardless of capitalization/spaces.
+        function getCol(row, preferredNames) {
+            const keys = Object.keys(row || {});
+            for (const name of preferredNames) {
+                const target = normalizeKey(name);
+                const key = keys.find(k => normalizeKey(k) === target);
+                if (key) return row[key];
+            }
+            return "";
+        }
+
+        // =========================
+        // 3) RENDERING
+        // =========================
+        function renderNavButtons(days) {
+            const nav = document.getElementById("nav-days");
+            nav.innerHTML = "";
+            days.forEach((d, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "day-btn" + (idx === 0 ? " active" : "");
+                btn.textContent = String(d);
+                btn.addEventListener("click", () => showDay(d, btn));
+                nav.appendChild(btn);
+            });
+        }
+
+        function renderDayCard(row) {
+            const day = Number(getCol(row, ["Giorno", "Day", "giorno"]));
+            const subtitle = getCol(row, ["Sottotitolo", "Subtitle", "Titolo", "Header"]);
+
+            // Summary fields (formerly "Parte 1", but we do NOT show that label)
+            const formato = getCol(row, ["Formato", "Format"]);
+            const tipoVisuale = getCol(row, ["Tipo_visuale", "Tipo visuale", "Visual"]);
+            const topic = getCol(row, ["Topic", "Topic (EN)", "Tema"]);
+            const workingTitle = getCol(row, ["Working_title", "Working title", "Titolo"]);
+
+
+            // Dropdown titles (optional) + contents (required)
+            const testoTitle = getCol(row, ["Testo_Title", "Testo title", "Titolo Testo"]) || "Testo Esatto";
+            const testo = getCol(row, ["Testo", "Testo_Esatto", "Testo Esatto", "Testo_esatto"]);
+            const design = getCol(row, ["Design_Specs", "Design Specs", "Design"]);
+            const noteImp = getCol(row, ["Note_Impaginazione", "Note impaginazione", "Note di impaginazione"]);
+            const caption = getCol(row, ["Caption", "Caption (EN)", "Caption_EN"]);
+            const noteMe = getCol(row, ["Note_per_me", "Note per me", "Note IT", "Note"]);
+
+            const card = document.createElement("div");
+            card.className = "day-card";
+            card.id = `day-${day}`;
+
+            card.innerHTML = `
+                <div class="day-header">
+                    <div class="day-number">${String(day).padStart(2, "0")} <span>${escapeHtml(subtitle)}</span></div>
+                </div>
+
+                <!-- SUMMARY GRID (no "PARTE 1" label) -->
+                <div class="parte-uno">
+                    <div class="parte-uno-grid"></div>
+                </div>
+
+                <div class="dropdowns-container">
+                    ${dropdownSectionHtml("pen", stripLeadingEmoji(testoTitle), cellToHtml(testo, (/(^|\b)slide(\b|\s)/i.test(testoTitle) || /\bSlide\b/i.test(testo)) ? "slides" : "paragraph"))}
+                    ${dropdownSectionHtml("palette", "Design Specs", cellToHtml(design, "paragraph"))}
+                    ${dropdownSectionHtml("ruler", "Note di impaginazione", cellToHtml(noteImp, "list"))}
+                    ${dropdownSectionHtml("note", "Caption (EN)", cellToHtml(caption, "paragraph"))}
+                    ${dropdownSectionHtml("info", "Note per me (IT)", cellToHtml(noteMe, "paragraph"))}
+                </div>
+            `;
+
+            // Render summary grid (no "Parte 1" label)
+            const grid = card.querySelector(".parte-uno-grid");
+            if (grid) {
+                const items = [
+                    ["Formato", formato],
+                    ["Tipo visuale", tipoVisuale],
+                    ["Topic (EN)", topic],
+                    ["Working Title (EN)", workingTitle],
+                ].filter(([_, v]) => String(v ?? "").trim().length > 0);
+
+                grid.innerHTML = items.map(([label, v]) => `
+                    <div class="parte-uno-item">
+                        <span class="parte-uno-label">${escapeHtml(label)}</span>
+                        <span class="parte-uno-value">${parseInline(v)}</span>
+                    </div>
+                `).join("");
+            }
+
+            // Wire dropdown toggles
+            card.querySelectorAll(".dropdown-toggle").forEach(btn => {
+                btn.addEventListener("click", () => toggleDropdown(btn));
+            });
+
+            return card;
+        }
+
+        function dropdownSectionHtml(iconKey, titleText, bodyHtml) {
+            const icon = ICONS[iconKey] || "";
+            return `
+                <div class="dropdown-section">
+                    <button class="dropdown-toggle" type="button">
+                        <span class="dropdown-title">${icon}<span>${escapeHtml(titleText)}</span></span>
+                        <span class="dropdown-icon">${ICONS.chevron}</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <div class="dropdown-body">
+                            ${bodyHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDays(rows) {
+            // Keep only rows with a valid day number
+            const cleaned = rows
+                .map(r => ({ r, d: Number(getCol(r, ["Giorno", "Day", "giorno"])) }))
+                .filter(x => Number.isFinite(x.d) && x.d > 0)
+                .sort((a, b) => a.d - b.d);
+
+            const uniqueDays = [];
+            const byDay = new Map();
+
+            cleaned.forEach(x => {
+                if (!byDay.has(x.d)) {
+                    byDay.set(x.d, x.r);
+                    uniqueDays.push(x.d);
+                }
+            });
+
+            renderNavButtons(uniqueDays);
+
+            const container = document.getElementById("days-container");
+            container.innerHTML = "";
+            uniqueDays.forEach(d => container.appendChild(renderDayCard(byDay.get(d))));
+        }
+
+        function renderRiepilogo(rows) {
+            if (!rows || !rows.length) return;
+            const r = rows[0];
+            const title = getCol(r, ["Titolo", "Title", "H1", "Nome"]);
+            const subtitle = getCol(r, ["Sottotitolo", "Subtitle"]);
+            const footer1 = getCol(r, ["Footer_1", "Footer1"]);
+            const footer2 = getCol(r, ["Footer_2", "Footer2"]);
+
+            if (title) document.getElementById("page-title").textContent = title;
+            if (subtitle) document.getElementById("page-subtitle").textContent = subtitle;
+            if (footer1) document.getElementById("footer-line1").textContent = footer1;
+            if (footer2) document.getElementById("footer-line2").textContent = footer2;
+        }
+
+        // =========================
+        // 4) INTERACTIONS
+        // =========================
+        function showDay(dayKey, btn) {
+            const selectedCard = document.getElementById(`day-${dayKey}`);
+            const nav = document.querySelector(".nav-container");
+
+            if (selectedCard) {
+                const navH = nav ? nav.getBoundingClientRect().height : 0;
+                const rect = selectedCard.getBoundingClientRect();
+                const targetY = window.scrollY + rect.top - navH - 12; // 12px di respiro sotto la navbar
+
+                window.scrollTo({ top: targetY, behavior: "smooth" });
+            }
+
+            document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
+            if (btn) btn.classList.add("active");
+        }
+
+        function toggleDropdown(button) {
+            button.classList.toggle("open");
+            const content = button.nextElementSibling;
+            if (content) content.classList.toggle("open");
+        }
+
+        // =========================
+        // 5) BOOT
+        // =========================
+        async function boot() {
+            try {
+                setStatus("Caricamento dati…");
+
+                // Riepilogo (optional)
+                try {
+                    const riepilogoCsv = await fetchCsv(CONFIG.riepilogoSheetName);
+                    renderRiepilogo(parseCsv(riepilogoCsv));
+                } catch (e) {
+                    console.warn("Riepilogo non caricato:", e);
+                }
+
+                // Giorni (required)
+                const giorniCsv = await fetchCsv(CONFIG.giorniSheetName);
+                const giorniRows = parseCsv(giorniCsv);
+                renderDays(giorniRows);
+
+                setStatus("");
+            } catch (err) {
+                console.error(err);
+                setStatus("Errore: " + err.message);
+            }
+        }
+
+        boot();
+    </script>
+</body>
+</html>
