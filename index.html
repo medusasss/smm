@@ -498,6 +498,14 @@
 
                 const giorniCsv = await fetchCsv(CONFIG.giorniSheetName);
                 const giorniRows = parseCsv(giorniCsv);
+                console.log("DEBUG: giorniRows length =", giorniRows.length);
+
+const row17 = giorniRows.find(r => String(getCol(r, ["Giorno","Day","giorno"])).includes("17/12"));
+console.log("DEBUG: row17 exists? =", !!row17);
+if (row17) console.log("DEBUG: row17 Giorno =", getCol(row17, ["Giorno","Day","giorno"]), row17);
+
+console.log("DEBUG: first 3 Giorno =", giorniRows.slice(0,3).map(r => getCol(r, ["Giorno","Day","giorno"])));
+
                 renderDays(giorniRows);
 
                 setStatus("");
