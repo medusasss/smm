@@ -445,16 +445,17 @@
         // =========================
         function showDay(dayKey, btn) {
     const selectedCard = document.getElementById(`day-${dayKey}`);
-    if (selectedCard) {
-        const offset = 100;
-        const y = selectedCard.getBoundingClientRect().top + window.pageYOffset - offset;
+    const navbar = document.querySelector('.nav-container');
+
+    if (selectedCard && navbar) {
+        const navHeight = navbar.offsetHeight;
+        const y = selectedCard.getBoundingClientRect().top + window.pageYOffset - navHeight - 12; // extra padding
         window.scrollTo({ top: y, behavior: 'smooth' });
     }
 
     document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
     if (btn) btn.classList.add("active");
 }
-
 
         function toggleDropdown(button) {
             button.classList.toggle("open");
